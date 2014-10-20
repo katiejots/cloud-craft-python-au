@@ -26,7 +26,7 @@ except IOError:
 # line, it's possible required libraries won't be in your searchable path
 
 if __name__ == '__main__':
-    application = imp.load_source('app', 'conveniences.py')
+    application = imp.load_source('app', 'loofu.py')
     port = application.app.config['PORT']
     ip = application.app.config['IP']
     app_name = application.app.config['APP_NAME']

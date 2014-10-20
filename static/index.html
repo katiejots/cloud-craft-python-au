@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Convenience Finder</title>
+    <title>LooFu Toilet Locator</title>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <!--[if lte IE 8]>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.ie.css" />
@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1 id="title"><img src="images/conveniencefinder.png" alt="Convenience Finder"/></h1>
+    <h1 id="title">LooFu Toilet Locator</h1>
     <div id="map"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script>
@@ -44,16 +44,38 @@
         });
     
         // Center the map and set the zoom level
-        var map = L.map('map').setView([-41.3, 174.8], 14);
+        var map = L.map('map').setView([-27.75,153.18], 10);
 
         //Add a layer group to hold the pins
         var markerLayerGroup = L.layerGroup().addTo(map);
 
         // Initialise the map with a tile layer and set max zoom and attribution
         L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: 'Map tiles by <a href="http://openstreetmap.org">OpenStreetMap</a>. Data by <a href="https://koordinates.com/layer/2219-wellington-city-public-conveniences/">Wellington City Council</a>, under <a href="https://koordinates.com/license/attribution-3-0-new-zealand">CC BY 3.0 NZ</a>.',
+          attribution: 'Map tiles by <a href="http://openstreetmap.org">OpenStreetMap</a>. Data by <a href="http://data.gov.au/dataset/national-public-toilet-map">Australian Department of Health and Ageing</a>, under <a href="http://creativecommons.org/licenses/by/3.0/au">CC BY 3.0 AU</a>.',
           maxZoom: 18
-        }).addTo(map);
+          }).addTo(map);
+
+        function createAccessibilityString(properties) {
+            var tokens = [];
+            if (properties.AccessibleMale && properties.AccessibleMale == 'True') tokens.push('Male');
+            if (properties.AccessibleFemale && properties.AccessibleFemale == 'True') tokens.push('Female');
+            if (properties.AccessibleUnisex && properties.AccessibleUnisex == 'True') tokens.push('Unisex');
+            return tokens.length == 0 ? 'None' : tokens.join(', ');
+        }
+
+        function splitCamelCase(str) {
+            return str.replace(/([a-z])([A-Z])/g, '$1 $2')
+                      .replace(/^./, function(str){ return str.toUpperCase(); });
+        }
+
+        function createOpeningHoursString(properties) {
+            if (properties.IsOpen == 'Variable') {
+                if (properties.OpeningHoursSchedule) return properties.OpeningHoursSchedule;
+                if (properties.OpeningHoursNote) return properties.OpeningHoursNote;
+                return 'Variable'; 
+            }
+            return splitCamelCase(properties.IsOpen);
+        }
 
         function getPins(e){
             bounds = map.getBounds();
@@ -70,10 +92,9 @@
             var markerArray = new Array(res.length);
             for (var i = 0; i < res.length; i++){
                 var toilet = res[i];
-                var info = '<div class="name">' + toilet.properties.Location + '</div>' +
-                           '<div class="hours">Open: ' + toilet.properties.Open_hours + '</div>' +
-                           '<div class="type">Type: ' + toilet.properties.Type + '</div>' +
-                           '<div class="disabled">Disabled Access: ' + toilet.properties.Disabled + '</div>';
+                var info = '<div class="name">' + toilet.properties.Name + '</div>' +
+                           '<div class="hours">Open: ' + createOpeningHoursString(toilet.properties) + '</div>' +
+                           '<div class="disabled">Accessible Facilities: ' + createAccessibilityString(toilet.properties) + '</div>';
                 markerArray[i] = L.marker([toilet.geometry.coordinates[1], toilet.geometry.coordinates[0]]).bindPopup(info);
                 // Add point with custom icon
                 // markerArray[i] = L.marker([toilet.geometry.coordinates[1], toilet.geometry.coordinates[0]], {icon: toiletIcon}).bindPopup(info);
@@ -87,6 +108,6 @@
         map.whenReady(getPins)
 
     </script>
-    <span id="fossribbon"><a href="https://openshift.redhat.com/app/console/application_types/custom?name=conveniences&initial_git_url=https%3A%2F%2Fgithub.com/codemiller/cloud-craft-python.git&cartridges[]=python&cartridges[]=mongodb-2&scale=true">Run me on OpenShift</a></span>
+    <span id="fossribbon"><a href="https://openshift.redhat.com/app/console/application_types/custom?name=loofu&initial_git_url=https%3A%2F%2Fgithub.com/codemiller/cloud-craft-python-au.git&cartridges[]=python&cartridges[]=mongodb-2&scale=true">Run me on OpenShift</a></span>
 </body>
 </html>
