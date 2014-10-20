@@ -10,104 +10,16 @@
     <script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Milonga' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />	
-    <style type="text/css">
-        body {
-            padding: 0;
-            margin: 0;
-        }
-        html, body, #map {
-            height: 100%;
-            font-family: 'Milonga', cursive;
-        }
-        .leaflet-container .leaflet-control-zoom {
-            margin-left: 13px;
-            margin-top: 100px;
-        }
-        #map { z-index: 1;}
-        #title { z-index: 2; position: absolute; left: 10px; }
-    </style>
+    <link rel="stylesheet" href="/css/MarkerCluster.css" />
+    <link rel="stylesheet" href="/css/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="/css/map.css" />
 </head>
 <body>
     <h1 id="title">LooFu Toilet Locator</h1>
     <div id="map"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-    <script>
-        // Custom icon
-        var toiletIcon = L.icon({
-            iconUrl: 'images/toilet.png',
-            shadowUrl: 'images/toilet-shadow.png',
-            iconSize:     [39, 50],
-            shadowSize:   [33, 25],
-            iconAnchor:   [19, 50],
-            shadowAnchor: [0, 25],
-            popupAnchor:  [-5, -40]
-        });
-    
-        // Center the map and set the zoom level
-        var map = L.map('map').setView([-27.75,153.18], 10);
-
-        //Add a layer group to hold the pins
-        var markerLayerGroup = L.layerGroup().addTo(map);
-
-        // Initialise the map with a tile layer and set max zoom and attribution
-        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: 'Map tiles by <a href="http://openstreetmap.org">OpenStreetMap</a>. Data by <a href="http://data.gov.au/dataset/national-public-toilet-map">Australian Department of Health and Ageing</a>, under <a href="http://creativecommons.org/licenses/by/3.0/au">CC BY 3.0 AU</a>.',
-          maxZoom: 18
-          }).addTo(map);
-
-        function createAccessibilityString(properties) {
-            var tokens = [];
-            if (properties.AccessibleMale && properties.AccessibleMale == 'True') tokens.push('Male');
-            if (properties.AccessibleFemale && properties.AccessibleFemale == 'True') tokens.push('Female');
-            if (properties.AccessibleUnisex && properties.AccessibleUnisex == 'True') tokens.push('Unisex');
-            return tokens.length == 0 ? 'None' : tokens.join(', ');
-        }
-
-        function splitCamelCase(str) {
-            return str.replace(/([a-z])([A-Z])/g, '$1 $2')
-                      .replace(/^./, function(str){ return str.toUpperCase(); });
-        }
-
-        function createOpeningHoursString(properties) {
-            if (properties.IsOpen == 'Variable') {
-                if (properties.OpeningHoursSchedule) return properties.OpeningHoursSchedule;
-                if (properties.OpeningHoursNote) return properties.OpeningHoursNote;
-                return 'Variable'; 
-            }
-            return splitCamelCase(properties.IsOpen);
-        }
-
-        function getPins(e){
-            bounds = map.getBounds();
-            url = "toilets/within?lat1=" + bounds.getNorthEast().lat + "&lon1=" + bounds.getNorthEast().lng + "&lat2=" + bounds.getSouthWest().lat + "&lon2=" + bounds.getSouthWest().lng;
-            $.get(url, pinTheMap, "json");
-        }
-
-        function pinTheMap(data){
-            // Clear current pins
-            map.removeLayer(markerLayerGroup);
-            var res = data.results;
-
-            // Add new pins
-            var markerArray = new Array(res.length);
-            for (var i = 0; i < res.length; i++){
-                var toilet = res[i];
-                var info = '<div class="name">' + toilet.properties.Name + '</div>' +
-                           '<div class="hours">Open: ' + createOpeningHoursString(toilet.properties) + '</div>' +
-                           '<div class="disabled">Accessible Facilities: ' + createAccessibilityString(toilet.properties) + '</div>';
-                markerArray[i] = L.marker([toilet.geometry.coordinates[1], toilet.geometry.coordinates[0]]).bindPopup(info);
-                // Add point with custom icon
-                // markerArray[i] = L.marker([toilet.geometry.coordinates[1], toilet.geometry.coordinates[0]], {icon: toiletIcon}).bindPopup(info);
-            }
-
-            markerLayerGroup = L.layerGroup(markerArray).addTo(map);
-        }
-
-        map.on('dragend', getPins);
-        map.on('zoomend', getPins);
-        map.whenReady(getPins)
-
-    </script>
+    <script src="/scripts/leaflet.markercluster.js"></script>
+    <script src="/scripts/map.js"></script>
     <span id="fossribbon"><a href="https://openshift.redhat.com/app/console/application_types/custom?name=loofu&initial_git_url=https%3A%2F%2Fgithub.com/codemiller/cloud-craft-python-au.git&cartridges[]=python&cartridges[]=mongodb-2&scale=true">Run me on OpenShift</a></span>
 </body>
 </html>
