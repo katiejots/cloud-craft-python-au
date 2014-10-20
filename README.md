@@ -1,4 +1,4 @@
-# Map of Public Conveniences in Wellington
+# Map of Public Toilets in Australia 
 *powered by Flask, Python, MongoDB, and Leaflet.js*
 
 To deploy a clone of this application using the [`rhc` command line tool](http://rubygems.org/gems/rhc):
