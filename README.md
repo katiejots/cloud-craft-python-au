@@ -35,4 +35,4 @@ This code is dedicated to the public domain to the maximum extent permitted by a
 
 App based on code by [TheSteve0](https://github.com/thesteve0/pythonwebmap) and [ryanj](https://github.com/ryanj/flask-base).
 
-Toilet icons and banner contributed by [Ben Hoad](http://benhoad.net).
+Toilet icons contributed by [Ben Hoad](http://benhoad.net).
